@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --surface-base: 255 255 255;
+  --surface-subtle: 245 245 245;
+  --surface-panel: 255 255 255;
+  --surface-border: 229 229 229;
+  --ink: 17 17 17;
+  --ink-muted: 91 91 91;
+  --brand-text: 128 0 255;
+}
+
+.dark {
+  --surface-base: 0 0 0;
+  --surface-subtle: 17 17 17;
+  --surface-panel: 23 23 23;
+  --surface-border: 41 41 41;
+  --ink: 255 255 255;
+  --ink-muted: 163 163 163;
+  --brand-text: 179 102 255;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-surface-base text-ink font-sans leading-[1.5] antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display leading-[1.2] tracking-tight;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-400 ring-offset-2 ring-offset-surface-base;
+  }
+}
+
+@layer components {
+  .theme-transition,
+  .theme-transition * {
+    transition:
+      background-color 0.4s ease,
+      border-color 0.4s ease,
+      color 0.4s ease,
+      fill 0.4s ease !important;
+  }
+
+  .surface-grid {
+    background-image:
+      linear-gradient(rgb(var(--surface-border) / 0.5) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--surface-border) / 0.5) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  .glass {
+    @apply border border-surface-border bg-surface-panel/70 backdrop-blur-xl;
+  }
+
+  .text-gradient-brand {
+    @apply bg-gradient-to-r from-brand-400 via-brand-500 to-brand-300 bg-clip-text text-transparent;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-brand-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_10px_30px_-10px_rgba(128,0,255,0.7)] transition duration-300 hover:-translate-y-0.5 hover:bg-brand-600 hover:shadow-[0_16px_40px_-10px_rgba(128,0,255,0.85)] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-surface-border bg-surface-panel px-6 py-3 text-sm font-semibold text-ink transition duration-300 hover:-translate-y-0.5 hover:border-brand-400 hover:text-brand-text disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .input-base {
+    @apply w-full rounded-xl border border-surface-border bg-surface-base px-4 py-3 text-sm text-ink placeholder:text-ink-muted transition duration-200 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-400/40;
+  }
+}
