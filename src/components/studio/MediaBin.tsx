@@ -96,7 +96,7 @@ export default function MediaBin({
           ref={inputRef}
           type="file"
           multiple
-          accept="video/mp4,video/webm,video/quicktime,image/jpeg,image/png,image/webp,image/gif,audio/mpeg,audio/wav,audio/mp4,audio/ogg"
+          accept=".mp4,.m4v,.webm,.mov,.qt,.jpg,.jpeg,.jpe,.png,.webp,.gif,.mp3,.wav,.m4a,.ogg,.oga,video/mp4,video/webm,video/quicktime,video/x-m4v,image/jpeg,image/jpg,image/png,image/webp,image/gif,audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/x-m4a,audio/ogg"
           className="hidden"
           onChange={(event) => handleFiles(event.target.files)}
         />

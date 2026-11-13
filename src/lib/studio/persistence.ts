@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import { createEmptyDoc, isTimelineDoc, type TimelineDoc } from '@/lib/studio/types';
 import { toUserError } from '@/lib/errors';
+import { getSupportedMediaFile } from '@/lib/studio/media';
 
 export type LoadedProject = { id: string; title: string; document: TimelineDoc; updatedAt: string };
 
@@ -38,10 +39,24 @@ export async function uploadStudioMedia(
 ): Promise<string> {
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 120);
   const path = `${userId}/${projectId}/${mediaId}-${safeName}`;
+  const supported = getSupportedMediaFile(file);
+  if (!supported) throw new Error(`${file.name} is not a supported video, image, or audio file.`);
   const { error } = await supabase.storage
     .from('studio-media')
-    .upload(path, file, { contentType: file.type, upsert: false });
-  if (error) throw toUserError('studio.upload', error);
+    .upload(path, file, { contentType: supported.contentType, upsert: false });
+  if (error) {
+    const statusCode = 'statusCode' in error ? String(error.statusCode) : '';
+    const message = error.message.toLowerCase();
+    if (statusCode === '413' || message.includes('payload too large')) {
+      console.error('[studio.upload]', error);
+      throw new Error(`${file.name} exceeds this project's upload limit. Try a smaller file or increase the Storage upload limit in Supabase.`);
+    }
+    if (statusCode === '415' || message.includes('mime type')) {
+      console.error('[studio.upload]', error);
+      throw new Error(`${file.name} uses a format that this project's media storage does not accept.`);
+    }
+    throw toUserError('studio.upload', error);
+  }
   return path;
 }
 
