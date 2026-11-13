@@ -319,11 +319,9 @@ export default function StudioWorkspace({ projectId, userId, title, initialDoc, 
             doc={doc}
             importing={importing}
             importError={importError}
-            initialFilter={mobilePanel === 'audio' ? 'audio' : mobilePanel === 'overlay' ? 'image' : 'all'}
             onImport={handleImport}
             onAddToTimeline={addToTimeline}
             onAddText={addText}
-            compact
           />
         </div>
 
@@ -424,9 +422,11 @@ export default function StudioWorkspace({ projectId, userId, title, initialDoc, 
                   doc={doc}
                   importing={importing}
                   importError={importError}
+                  initialFilter={mobilePanel === 'audio' ? 'audio' : mobilePanel === 'overlay' ? 'image' : 'all'}
                   onImport={handleImport}
                   onAddToTimeline={addToTimeline}
                   onAddText={addText}
+                  compact
                 />
               )}
               {mobilePanel === 'text' && (

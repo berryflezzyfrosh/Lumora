@@ -1,4 +1,4 @@
-import { useRef, useState, type DragEvent } from 'react';
+import { useEffect, useRef, useState, type DragEvent } from 'react';
 import { AudioLines, Film, GripVertical, Image as ImageIcon, Loader2, Plus, Type, Upload } from 'lucide-react';
 import { formatSeconds } from '@/lib/studio/timeline';
 import { MEDIA_DRAG_TYPE } from '@/components/studio/dragTypes';
@@ -32,6 +32,10 @@ export default function MediaBin({
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const [kindFilter, setKindFilter] = useState<'all' | 'video' | 'image' | 'audio'>(initialFilter);
+
+  useEffect(() => {
+    setKindFilter(initialFilter);
+  }, [initialFilter]);
 
   const handleFiles = (files: FileList | null) => {
     if (files && files.length > 0) onImport(Array.from(files));
