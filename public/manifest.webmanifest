@@ -1,0 +1,24 @@
+{
+  "name": "LUMORA — Create Beyond Imagination",
+  "short_name": "LUMORA",
+  "description": "A creative video, photo, and motion editing studio.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#09070e",
+  "theme_color": "#8000ff",
+  "icons": [
+    {
+      "src": "./icons/lumora-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/lumora-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

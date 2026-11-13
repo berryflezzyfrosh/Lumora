@@ -1,5 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
+import PwaRuntime from '@/components/PwaRuntime';
 import { AuthProvider, useAuth } from '@/lib/auth';
 import {
   entryRedirect,
@@ -144,6 +145,7 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
+        <PwaRuntime />
         <AppShell />
       </AuthProvider>
     </ThemeProvider>
