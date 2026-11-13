@@ -8,6 +8,8 @@ type MediaBinProps = {
   doc: TimelineDoc;
   importing: number;
   importError: string | null;
+  compact?: boolean;
+  initialFilter?: 'all' | 'video' | 'image' | 'audio';
   onImport: (files: File[]) => void;
   onAddToTimeline: (mediaId: string) => void;
   onAddText: () => void;
@@ -17,9 +19,19 @@ function hasFiles(event: DragEvent) {
   return Array.from(event.dataTransfer.types).includes('Files');
 }
 
-export default function MediaBin({ doc, importing, importError, onImport, onAddToTimeline, onAddText }: MediaBinProps) {
+export default function MediaBin({
+  doc,
+  importing,
+  importError,
+  compact = false,
+  initialFilter = 'all',
+  onImport,
+  onAddToTimeline,
+  onAddText,
+}: MediaBinProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
+  const [kindFilter, setKindFilter] = useState<'all' | 'video' | 'image' | 'audio'>(initialFilter);
 
   const handleFiles = (files: FileList | null) => {
     if (files && files.length > 0) onImport(Array.from(files));
@@ -27,6 +39,9 @@ export default function MediaBin({ doc, importing, importError, onImport, onAddT
   };
 
   const usageCount = (mediaId: string) => doc.clips.filter((clip) => clip.mediaId === mediaId).length;
+  const filteredMedia = doc.media.filter(
+    (item) => !compact || kindFilter === 'all' || item.kind === kindFilter,
+  );
 
   return (
     <section className="flex h-full min-h-0 flex-col gap-4">
@@ -48,29 +63,31 @@ export default function MediaBin({ doc, importing, importError, onImport, onAddT
           setDragging(false);
           handleFiles(event.dataTransfer.files);
         }}
-        className={`flex flex-col items-center gap-3 rounded-2xl border-2 border-dashed px-4 py-6 text-center transition ${
+        className={`flex ${
+          compact ? 'flex-row flex-wrap items-center justify-between gap-2 rounded-xl px-3 py-2 text-left' : 'flex-col items-center gap-3 rounded-2xl px-4 py-6 text-center'
+        } border-2 border-dashed transition ${
           dragging ? 'border-brand-400 bg-brand-500/10' : 'border-surface-border bg-surface-subtle'
         }`}
       >
         {importing > 0 ? (
-          <Loader2 className="h-6 w-6 animate-spin text-brand-text" aria-label="Importing" />
+          <Loader2 className={`${compact ? 'h-4 w-4' : 'h-6 w-6'} animate-spin text-brand-text`} aria-label="Importing" />
         ) : (
-          <Upload className="h-6 w-6 text-brand-text" />
+          <Upload className={`${compact ? 'h-4 w-4' : 'h-6 w-6'} text-brand-text`} />
         )}
-        <p className="text-xs text-ink-muted">
+        <p className={`${compact ? 'flex-1' : ''} text-xs text-ink-muted`}>
           {importing > 0 ? `Importing ${importing} file${importing === 1 ? '' : 's'}...` : 'Drop video, image, or audio here'}
         </p>
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={importing > 0}
-          className="btn-secondary !px-4 !py-2 text-xs disabled:opacity-50"
+          className={`btn-secondary !px-4 !py-2 text-xs disabled:opacity-50 ${compact ? '!py-1.5' : ''}`}
         >
-          Choose files
+          {compact ? 'Import' : 'Choose files'}
         </button>
-        <button type="button" onClick={onAddText} className="btn-secondary !px-4 !py-2 text-xs">
+        {!compact && <button type="button" onClick={onAddText} className="btn-secondary !px-4 !py-2 text-xs">
           <Type className="h-3.5 w-3.5" /> Add text
-        </button>
+        </button>}
         <input
           ref={inputRef}
           type="file"
@@ -87,11 +104,34 @@ export default function MediaBin({ doc, importing, importError, onImport, onAddT
         </p>
       )}
 
+      {compact && (
+        <div className="flex shrink-0 gap-1 overflow-x-auto py-1">
+          {([
+            { id: 'all', label: 'All' },
+            { id: 'video', label: 'Videos' },
+            { id: 'image', label: 'Photos' },
+            { id: 'audio', label: 'Audio' },
+          ] as const).map(({ id, label }) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setKindFilter(id)}
+              aria-pressed={kindFilter === id}
+              className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-medium ${
+                kindFilter === id ? 'bg-brand-500/10 text-brand-text' : 'text-ink-muted hover:bg-surface-subtle'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+
       <ul className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pr-1">
         {doc.media.length === 0 && (
           <li className="py-8 text-center text-xs text-ink-muted">Your imported files appear here.</li>
         )}
-        {doc.media.map((item) => (
+        {filteredMedia.map((item) => (
           <MediaRow
             key={item.id}
             item={item}
@@ -99,6 +139,9 @@ export default function MediaBin({ doc, importing, importError, onImport, onAddT
             onAdd={() => onAddToTimeline(item.id)}
           />
         ))}
+        {doc.media.length > 0 && filteredMedia.length === 0 && (
+          <li className="py-4 text-center text-xs text-ink-muted">No {kindFilter} files imported yet.</li>
+        )}
       </ul>
     </section>
   );

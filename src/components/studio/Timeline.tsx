@@ -18,6 +18,7 @@ type DragState = { mode: DragMode; clip: Clip; originX: number; mediaDuration: n
 type TimelineProps = {
   doc: TimelineDoc;
   pixelsPerSecond: number;
+  compact?: boolean;
   time: number;
   selectedIds: Set<string>;
   onZoom: (direction: -1 | 1) => void;
@@ -46,6 +47,7 @@ function formatRulerLabel(seconds: number) {
 export default function Timeline({
   doc,
   pixelsPerSecond,
+  compact = false,
   time,
   selectedIds,
   onZoom,
@@ -54,6 +56,7 @@ export default function Timeline({
   onEdit,
   onDropMedia,
 }: TimelineProps) {
+  const trackHeaderWidth = compact ? 48 : TRACK_HEADER_WIDTH;
   const [preview, setPreview] = useState<Record<string, Preview>>({});
   const [dragging, setDragging] = useState<DragState | null>(null);
   const [scrubbing, setScrubbing] = useState(false);
@@ -213,11 +216,11 @@ export default function Timeline({
       </div>
 
       <div className="min-h-0 flex-1 overflow-auto">
-        <div className="relative" style={{ width: TRACK_HEADER_WIDTH + width, minWidth: '100%' }}>
+        <div className="relative" style={{ width: trackHeaderWidth + width, minWidth: '100%' }}>
           <div className="flex sticky top-0 z-30 bg-surface-panel" style={{ height: RULER_HEIGHT }}>
             <div
               className="sticky left-0 z-30 border-b border-r border-surface-border bg-surface-panel"
-              style={{ width: TRACK_HEADER_WIDTH }}
+              style={{ width: trackHeaderWidth, minWidth: trackHeaderWidth }}
             />
             <div
               ref={rulerRef}
@@ -250,14 +253,14 @@ export default function Timeline({
             <div key={track.id} className="flex" style={{ height: TRACK_HEIGHT }}>
               <div
                 className="sticky left-0 z-10 flex items-center gap-2 border-b border-r border-surface-border bg-surface-panel px-3"
-                style={{ width: TRACK_HEADER_WIDTH }}
+                style={{ width: trackHeaderWidth, minWidth: trackHeaderWidth }}
               >
                 {track.kind === 'audio' ? (
                   <AudioLines className="h-4 w-4 text-success-600 dark:text-success-400" />
                 ) : (
                   <Film className="h-4 w-4 text-brand-text" />
                 )}
-                <span className="truncate text-xs font-semibold text-ink">{track.name}</span>
+                <span className={compact ? 'sr-only' : 'truncate text-xs font-semibold text-ink'}>{track.name}</span>
               </div>
               <div
                 data-track-id={track.id}
@@ -269,6 +272,7 @@ export default function Timeline({
                 }}
                 onDrop={(event) => handleTrackDrop(event, track.id)}
                 onPointerDown={() => onSelect('', false)}
+                aria-label={`${track.name} track`}
                 className="relative border-b border-surface-border bg-surface-base/60"
                 style={{ width, height: TRACK_HEIGHT }}
               >
