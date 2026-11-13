@@ -41,9 +41,12 @@ export async function uploadStudioMedia(
   const path = `${userId}/${projectId}/${mediaId}-${safeName}`;
   const supported = getSupportedMediaFile(file);
   if (!supported) throw new Error(`${file.name} is not a supported video, image, or audio file.`);
+  const uploadFile = file.type === supported.contentType
+    ? file
+    : new File([file], file.name, { type: supported.contentType, lastModified: file.lastModified });
   const { error } = await supabase.storage
     .from('studio-media')
-    .upload(path, file, { contentType: supported.contentType, upsert: false });
+    .upload(path, uploadFile, { contentType: supported.contentType, upsert: false });
   if (error) {
     const statusCode = 'statusCode' in error ? String(error.statusCode) : '';
     const message = error.message.toLowerCase();
