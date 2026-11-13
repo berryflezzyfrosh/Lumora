@@ -1,4 +1,11 @@
+import { lazy, Suspense } from 'react';
 import { Link } from '@/lib/router';
+
+const LrOrbitLogo = lazy(() =>
+  import('@/components/brand/LrOrbitLogo').then(({ LrOrbitLogo: OrbitLogo }) => ({
+    default: OrbitLogo,
+  })),
+);
 
 type LogoProps = {
   size?: 'sm' | 'md' | 'lg';
@@ -13,13 +20,20 @@ const sizes = {
 };
 
 export function LogoMark({ size = 'md' }: { size?: LogoProps['size'] }) {
+  const className = `${sizes[size ?? 'md'].glyph} drop-shadow-[0_6px_14px_rgba(128,0,255,0.45)]`;
   return (
-    <img
-      src={`${import.meta.env.BASE_URL}lumora-logo.png`}
-      alt=""
-      draggable={false}
-      className={`${sizes[size ?? 'md'].glyph} object-contain drop-shadow-[0_6px_14px_rgba(128,0,255,0.45)]`}
-    />
+    <Suspense
+      fallback={
+        <img
+          src={`${import.meta.env.BASE_URL}lumora-logo.png`}
+          alt=""
+          draggable={false}
+          className={`${className} object-contain`}
+        />
+      }
+    >
+      <LrOrbitLogo className={className} />
+    </Suspense>
   );
 }
 
