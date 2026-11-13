@@ -1,4 +1,3 @@
-import { LrGlyph } from '@/components/brand/LrMark';
 import { Link } from '@/lib/router';
 
 type LogoProps = {
@@ -14,7 +13,14 @@ const sizes = {
 };
 
 export function LogoMark({ size = 'md' }: { size?: LogoProps['size'] }) {
-  return <LrGlyph className={`${sizes[size ?? 'md'].glyph} drop-shadow-[0_6px_14px_rgba(128,0,255,0.45)]`} />;
+  return (
+    <img
+      src={`${import.meta.env.BASE_URL}lumora-logo.png`}
+      alt=""
+      draggable={false}
+      className={`${sizes[size ?? 'md'].glyph} object-contain drop-shadow-[0_6px_14px_rgba(128,0,255,0.45)]`}
+    />
+  );
 }
 
 export default function Logo({ size = 'md', withWordmark = true, to = '/' }: LogoProps) {
